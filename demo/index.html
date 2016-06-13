@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <title>drone-api demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../bower_components/polymer/polymer.html">
+    <link rel="import" href="../bower_components/iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../bower_components/iron-demo-helpers/demo-snippet.html">
+
+    <link rel="import" href="../drone-api.html">
+
+    <style is="custom-style" include="demo-pages-shared-styles">
+    </style>
+  </head>
+  <body>
+
+    <div class="vertical-section-container centered">
+      <h3>Basic drone-api Demo</h3>
+      <demo-snippet>
+        <template>
+          <drone-api id="drone" server="http://beta.drone.io"></drone-api>
+          <script>
+            var drone = document.getElementById("drone");
+            drone.getRepo("drone", "drone").then(function(repo){
+              console.log(repo)
+            }.bind(this)).catch(function(err) {
+              console.log(err)
+            });
+
+
+          </script>
+        </template>
+      </demo-snippet>
+    </div>
+
+  </body>
+</html>

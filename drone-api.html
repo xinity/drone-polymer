@@ -1,0 +1,205 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<dom-module id="drone-api">
+  <script>
+    Polymer({
+      is: "drone-api",
+
+      properties: {
+        /**
+         * API server address.
+         * Ex: http://my.drone.io
+         */
+        server: {
+          type: String,
+        },
+
+        /**
+         * API authorization token.
+         */
+        token: {
+          type: String,
+        }
+      },
+
+      /**
+       * Returns the user repository list.
+       */
+      getRepoList: function(opts) {
+        return this._get("/api/user/repos");
+      },
+
+      /**
+       * Returns the repository by owner and name.
+       * @param {string} repository owner.
+       * @param {string} repository name.
+       */
+      getRepo: function(owner, name) {
+        var endpoint = ["/api/repos", owner, name].join("/");
+        return this._get(endpoint);
+      },
+
+      /**
+       * Activates the repository by owner and name.
+       * @param {string} repository owner.
+       * @param {string} repository name.
+       */
+      activateRepo: function(owner, name) {
+        var endpoint = ["/api/repos", owner, name].join("/");
+        return this._post(endpoint);
+      },
+
+      /**
+       * Updates the repository.
+       * @param {Object} repository object.
+       */
+      updateRepo: function(repo) {
+        var endpoint = ["/api/repos", repo.owner, repo.name].join("/");
+        return this._patch(endpoint, repo);
+      },
+
+      /**
+       * Deletes the repository by owner and name.
+       * @param {string} repository owner.
+       * @param {string} repository name.
+       */
+      deleteRepo: function(owner, name) {
+        var endpoint = ["/api/repos", repo.owner, repo.name].join("/");
+        return this._delete(endpoint, repo);
+      },
+
+      /**
+       * Returns the build list for the given repository.
+       * @param {Object} repository object.
+       * @param {Object} request options.
+       */
+      getBuildList: function(repo, opts) {
+        var endpoint = ["/api/repos", repo.owner, repo.name, "builds"].join("/");
+        return this._get(endpoint);
+      },
+
+      /**
+       * Returns the build by number for the given repository.
+       * @param {Object} repository object.
+       * @param {number} build number.
+       */
+      getBuild: function(repo, number) {
+        var endpoint = ["/api/repos", repo.owner, repo.name, "builds", number].join("/");
+        return this._get(endpoint);
+      },
+
+      /**
+       * Cancels the build by number for the given repository.
+       * @param {Object} repository object.
+       * @param {number} build number.
+       */
+      cancelBuild: function(repo, number) {
+        var endpoint = ["/api/repos", repo.owner, repo.name, "builds", number].join("/");
+        return this._delete(endpoint);
+      },
+
+      /**
+       * Restarts the build by number for the given repository.
+       * @param {Object} repository object.
+       * @param {number} build number.
+       */
+      restartBuild: function(repo, number) {
+        var endpoint = ["/api/repos", repo.owner, repo.name, "builds", number].join("/");
+        return this._post(endpoint);
+      },
+
+      /**
+       * Returns the build by number for the given repository.
+       * @param {Object} repository object.
+       * @param {number} build number.
+       */
+      getLogs: function(repo, number, job) {
+        var endpoint = ["/api/repos", repo.owner, repo.name, "logs", number, job].join("/");
+        return this._get(endpoint)
+      },
+
+      /**
+       * Returns a Promise for an XHR GET request.
+       * @private
+       * @param {string} request path.
+      */
+      _get: function(path) {
+        return this._request("GET", path, null);
+      },
+
+      /**
+       * Returns a Promise for an XHR POST request.
+       * @private
+       * @param {string} request path.
+       * @param {Object} request data.
+      */
+      _post: function(path, data) {
+        return this._request("POST", path, data);
+      },
+
+      /**
+       * Returns a Promise for an XHR PUT request.
+       * @private
+       * @param {string} request path.
+       * @param {Object} request data.
+      */
+      _put: function(path, data) {
+        return this._request("PUT", path, data);
+      },
+
+      /**
+       * Returns a Promise for an XHR PATCH request.
+       * @private
+       * @param {string} request path.
+       * @param {Object} request data.
+      */
+      _patch: function(path, data) {
+        return this._request("PATCH", path, data);
+      },
+
+      /**
+       * Returns a Promise for an XHR DELETE request.
+       * @private
+       * @param {string} request path.
+       */
+      _delete: function(path) {
+        return this._request("DELETE", path, null);
+      },
+
+      /**
+       * Returns a Promise for an XHR request.
+       * @private
+       * @param {string} request method.
+       * @param {string} request path.
+       * @param {Object} request data.
+       */
+      _request: function(method, path, data) {
+        var endpoint = [this.server, path].join("");
+        var xhr = new XMLHttpRequest();
+        xhr.open(method, endpoint, true);
+        if (this.token) {
+          xhr.setRequestHeader("Authorization", "Bearer "+this.token);
+        }
+        return new Promise(function (resolve, reject) {
+          xhr.onload = function () {
+            if (xhr.status >= 300) {
+              reject(xhr);
+            } else {
+              resolve(JSON.parse(xhr.response));
+            }
+          };
+          xhr.onerror = function () {
+            reject(xhr.response);
+          };
+
+          if (data) {
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify(data));
+          } else {
+            xhr.send();
+          }
+        });
+      }
+    });
+  </script>
+</dom-module>
