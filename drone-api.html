@@ -119,6 +119,13 @@
       },
 
       /**
+       * Returns the user's personal API token.
+       */
+       getToken: function() {
+         return this._post("/api/user/token");
+       },
+
+      /**
        * Returns a Promise for an XHR GET request.
        * @private
        * @param {string} request path.
@@ -167,6 +174,15 @@
       },
 
       /**
+       * Returns true if the XHR response is a JSON document.
+       * @private
+       * @param {Object} XHR response.
+       */
+      _isJSON: function(xhr) {
+        return xhr.getResponseHeader("Content-Type").indexOf("json") != -1;
+      },
+
+      /**
        * Returns a Promise for an XHR request.
        * @private
        * @param {string} request method.
@@ -184,10 +200,12 @@
           xhr.onload = function () {
             if (xhr.status >= 300) {
               reject(xhr);
-            } else {
+            } else if (this._isJSON(xhr)) {
               resolve(JSON.parse(xhr.response));
+            } else {
+              resolve(xhr.response);
             }
-          };
+          }.bind(this);
           xhr.onerror = function () {
             reject(xhr.response);
           };
@@ -198,7 +216,7 @@
           } else {
             xhr.send();
           }
-        });
+        }.bind(this));
       }
     });
   </script>
