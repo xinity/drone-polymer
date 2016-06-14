@@ -26,7 +26,9 @@
        * Returns the user repository list.
        */
       getRepoList: function(opts) {
-        return this._get("/api/user/repos");
+        var query = this._query(opts);
+        var endpoint = ["/api/user/repos", query].join("");
+        return this._get(endpoint);
       },
 
       /**
@@ -174,12 +176,33 @@
       },
 
       /**
+       * Returns a query string from the given parameters.
+       * @param {Object} query parameters in key value object.
+       * @return {string} query string.
+       */
+      _query: function(opts) {
+        if (!opts) return;
+
+        var query = [];
+        for(var key in opts) {
+          var value = opts[key];
+          query.push([
+            encodeURIComponent(key),
+            encodeURIComponent(value)].join("=")
+          );
+        }
+        return query.length == 0 ? "" : "?" + query.join("&")
+      },
+
+      /**
        * Returns true if the XHR response is a JSON document.
        * @private
        * @param {Object} XHR response.
        */
       _isJSON: function(xhr) {
-        return xhr.getResponseHeader("Content-Type").indexOf("json") != -1;
+        return xhr.getResponseHeader("Content-Type").indexOf("json") != -1
+          || xhr.response.startsWith("{")  // HACK remove
+          || xhr.response.startsWith("["); // HACK remove
       },
 
       /**
