@@ -66,8 +66,8 @@
        * @param {string} repository name.
        */
       deleteRepo: function(owner, name) {
-        var endpoint = ["/api/repos", repo.owner, repo.name].join("/");
-        return this._delete(endpoint, repo);
+        var endpoint = ["/api/repos", owner, name].join("/");
+        return this._delete(endpoint);
       },
 
       /**
