@@ -81,6 +81,16 @@
       },
 
       /**
+       * returns the build feed for the user account.
+       * @param {Object} request options.
+       */
+      getBuildFeed: function(opts) {
+        var query = this._query(opts);
+        var endpoint = ["/api/user/feed", query].join("");
+        return this._get(endpoint);
+      },
+
+      /**
        * Returns the build by number for the given repository.
        * @param {Object} repository object.
        * @param {number} build number.
